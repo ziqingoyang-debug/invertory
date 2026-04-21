@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>断货影响拆解看板 Demo</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #182230;
+      --sub: #526071;
+      --line: #e6ebf2;
+      --blue: #3b82f6;
+      --green: #16a34a;
+      --amber: #d97706;
+      --red: #dc2626;
+      --purple: #7c3aed;
+      --shadow: 0 10px 28px rgba(20, 31, 56, 0.08);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .page {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%);
+      color: #fff;
+      border-radius: 28px;
+      padding: 28px 28px 22px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+    }
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+      line-height: 1.2;
+    }
+    .hero p {
+      margin: 0;
+      color: rgba(255,255,255,.9);
+      font-size: 14px;
+      line-height: 1.7;
+      max-width: 1200px;
+    }
+    .toolbar {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(120px, 1fr));
+      gap: 12px;
+      margin: 18px 0 18px;
+    }
+    .filter {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 10px 12px;
+      box-shadow: var(--shadow);
+    }
+    .filter label {
+      display: block;
+      font-size: 12px;
+      color: var(--sub);
+      margin-bottom: 6px;
+    }
+    .filter select, .filter button {
+      width: 100%;
+      padding: 10px 10px;
+      border: 1px solid #d8e0ea;
+      border-radius: 10px;
+      font-size: 14px;
+      background: #fff;
+      color: var(--text);
+    }
+    .filter button {
+      background: var(--blue);
+      color: #fff;
+      cursor: pointer;
+      border: none;
+      font-weight: 600;
+    }
+    .breadcrumbs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 8px 0 18px;
+    }
+    .crumb {
+      padding: 8px 12px;
+      background: #edf4ff;
+      color: #1d4ed8;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid #cfe1ff;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .kpi {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px 16px 14px;
+      box-shadow: var(--shadow);
+    }
+    .kpi .label {
+      font-size: 12px;
+      color: var(--sub);
+      margin-bottom: 8px;
+    }
+    .kpi .value {
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+    .kpi .note {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--sub);
+      line-height: 1.5;
+    }
+    .section {
+      margin-bottom: 20px;
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: end;
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0;
+    }
+    .section-desc {
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--sub);
+      margin-top: 6px;
+      max-width: 1100px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 16px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 16px 18px 8px;
+      border-bottom: 1px solid rgba(230,235,242,.6);
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0 0 6px;
+    }
+    .card-desc {
+      font-size: 12px;
+      color: var(--sub);
+      line-height: 1.6;
+      margin: 0 0 8px;
+    }
+    .chart {
+      width: 100%;
+      height: 360px;
+    }
+    .chart.tall { height: 420px; }
+    .table-wrap {
+      padding: 14px 18px 18px;
+      overflow: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th, td {
+      padding: 10px 10px;
+      border-bottom: 1px solid #edf0f5;
+      text-align: left;
+      white-space: nowrap;
+    }
+    th {
+      background: #f8fafc;
+      color: #364152;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    tr:hover td { background: #fafcff; }
+    .tag {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .tag.stockout { background: #fee2e2; color: #b91c1c; }
+    .tag.no-stockout { background: #dcfce7; color: #166534; }
+    .tag.warning { background: #fef3c7; color: #92400e; }
+    .explain {
+      margin-top: 10px;
+      background: #f8fafc;
+      border: 1px dashed #d8e0ea;
+      border-radius: 14px;
+      padding: 12px 14px;
+      color: #445164;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .small {
+      font-size: 12px;
+      color: var(--sub);
+    }
+    .footer-note {
+      margin-top: 18px;
+      color: var(--sub);
+      font-size: 12px;
+      line-height: 1.7;
+      text-align: center;
+    }
+    @media (max-width: 1200px) {
+      .summary-grid, .toolbar, .grid-3, .grid-2, .split {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="hero">
+      <h1>断货影响拆解看板 Demo</h1>
+      <p>
+        本 demo 将“断货影响拆解”分为三层：第一层先判断“实际未达预计”是否由断货导致；第二层将未达预计拆分为“预测/执行偏差”与“断货导致”；第三层只对断货样本继续拆解断货来源（到货未达预期、KOL 占用、ToB 占用、计划库存不足）并测算收入/利润损失。所有图表均支持悬停查看更多信息，点击图表可逐层下钻，表格会同步刷新。
+      </p>
+    </div>
+
+    <div class="toolbar">
+      <div class="filter"><label>版本号</label><select id="versionFilter"></select></div>
+      <div class="filter"><label>国家</label><select id="countryFilter"></select></div>
+      <div class="filter"><label>月份</label><select id="monthFilter"></select></div>
+      <div class="filter"><label>一级品类</label><select id="categoryFilter"></select></div>
+      <div class="filter"><label>SKU</label><select id="skuFilter"></select></div>
+      <div class="filter"><label>&nbsp;</label><button id="resetBtn">重置全部筛选与下钻</button></div>
+    </div>
+
+    <div class="breadcrumbs" id="breadcrumbs"></div>
+
+    <div class="summary-grid" id="kpiGrid"></div>
+
+    <div class="section">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">第一层：结果判断</h2>
+          <div class="section-desc">
+            先判断“实际销量低于预计销量”的样本中，哪些属于真正的断货，哪些只是预测偏差或销售执行偏差。判断规则：若实际销量低于预计销量，且期末库存为 0，同时实际可卖库存小于预计销量，则认定为断货；否则先归为“非断货未达预计”。点击柱形或散点可继续下钻。
+          </div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">① 结果分类分布</h3>
+            <p class="card-desc">展示当前筛选范围内各 SKU 月份样本的判断结果。点击某一类，可在后续模块中聚焦查看该类样本。</p>
+          </div>
+          <div class="chart" id="resultBar"></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">② 预计 vs 实际 × 期末库存</h3>
+            <p class="card-desc">横轴为预计销量，纵轴为实际销量，气泡大小表示收入损失，颜色表示判断结果。虚线以下是“实际低于预计”的样本，期末库存为 0 且可卖库存不足的样本才是断货。</p>
+          </div>
+          <div class="chart" id="bubbleChart"></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px;">
+        <div class="card-header">
+          <h3 class="card-title">③ 样本明细</h3>
+          <p class="card-desc">表格展示每个版本 × 国家 × 月份 × SKU 的判断结果、库存口径、销量偏差和损失金额。点击表格行，会同步刷新第二层与第三层说明。</p>
+        </div>
+        <div class="table-wrap" id="level1Table"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">第二层：未达预计原因分类</h2>
+          <div class="section-desc">
+            仅针对“实际销量低于预计销量”的样本，继续区分：一类是“有货未卖完”，通常对应预测偏差或执行偏差；另一类是“断货导致”，即有需求但没货卖。此层帮助回答：销量没达标，到底是没卖动，还是没货卖。点击原因分类或 SKU 排名，可继续进入第三层断货原因拆解。</div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">① 未达预计原因占比</h3>
+            <p class="card-desc">仅统计“实际销量低于预计销量”的样本。点击扇区可锁定查看某一类原因。</p>
+          </div>
+          <div class="chart" id="reasonPie"></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">② 未达预计 SKU 排名</h3>
+            <p class="card-desc">按销量缺口排序，帮助快速定位影响最大的 SKU。颜色区分“断货导致”与“非断货未达预计”。点击某个 SKU 可查看第三层更细原因。</p>
+          </div>
+          <div class="chart tall" id="rankingBar"></div>
+        </div>
+      </div>
+      <div class="grid-2" style="margin-top:16px;">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">③ 两类案例说明</h3>
+            <p class="card-desc">看板自动选取一个“非断货未达预计”和一个“断货导致”的案例，帮助业务理解口径差异。</p>
+          </div>
+          <div class="table-wrap" id="caseExplain"></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">④ 第二层说明</h3>
+            <p class="card-desc">这里用自然语言解释当前筛选结果下，未达预计主要由什么驱动。</p>
+          </div>
+          <div class="table-wrap">
+            <div id="level2Narrative" class="explain"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">第三层：断货原因拆解与损失测算</h2>
+          <div class="section-desc">
+            仅对“断货导致”的样本做深挖。断货量定义为“预计销量 - 实际销量”；断货原因拆为“实际到货未达预期、KOL 占用高于计划、ToB 占用高于计划、期初库存不足/计划库存不足”。这一层回答：断货究竟是供应没到、库存被占、还是计划本身就不够。</div>
+        </div>
+      </div>
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">① 断货原因结构</h3>
+            <p class="card-desc">按断货量贡献拆分原因。点击某原因可查看对应 SKU 与损失明细。</p>
+          </div>
+          <div class="chart" id="causePie"></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">② 断货损失趋势</h3>
+            <p class="card-desc">按月份展示收入损失与利润损失，便于观察断货问题是否在改善。</p>
+          </div>
+          <div class="chart" id="lossTrend"></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">③ 断货根因矩阵</h3>
+            <p class="card-desc">横轴为断货量，纵轴为收入损失，颜色为断货原因，帮助识别高影响问题。</p>
+          </div>
+          <div class="chart" id="causeScatter"></div>
+        </div>
+      </div>
+      <div class="grid-2" style="margin-top:16px;">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">④ 断货样本明细与归因</h3>
+            <p class="card-desc">逐条列出断货样本的断货量、原因拆解和收入/利润损失，可用于业务复盘或追责。</p>
+          </div>
+          <div class="table-wrap" id="level3Table"></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">⑤ 第三层说明</h3>
+            <p class="card-desc">自动汇总当前筛选范围内断货最主要的驱动因素，并给出示例解释。</p>
+          </div>
+          <div class="table-wrap">
+            <div id="level3Narrative" class="explain"></div>
+            <div class="split" style="margin-top:12px;">
+              <div class="explain" id="formulaExplain"></div>
+              <div class="explain" id="selectedExplain"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      Demo 口径说明：本页面是用于业务对齐的示意版，示例数据为构造数据，但严格遵循“期末库存=0且可卖库存不足才定义为断货”的业务规则；图表和说明可直接作为后续 QuickBI / SQL / ECharts 看板开发蓝本。
+    </div>
+  </div>
+
+  <script>
+    const rawData = [
+      // 202602 - US - 202603 examples around v0.7L
+      {version:'202602', country:'US', month:'202603', category:'整桌', sku:'V0.7L型整桌', expected:312, actual:300, demand:312, opening:300, plannedArrival:200, actualArrival:200, plannedKOL:12, actualKOL:12, plannedToB:60, actualToB:60, price:499, marginRate:0.22},
+      {version:'202602', country:'US', month:'202603', category:'整桌', sku:'V1.0行政桌', expected:280, actual:280, demand:280, opening:350, plannedArrival:80, actualArrival:80, plannedKOL:5, actualKOL:5, plannedToB:20, actualToB:20, price:699, marginRate:0.24},
+      {version:'202602', country:'US', month:'202603', category:'配件', sku:'V系列抽屉', expected:420, actual:390, demand:420, opening:250, plannedArrival:200, actualArrival:200, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:89, marginRate:0.34},
+      {version:'202602', country:'US', month:'202603', category:'配件', sku:'键盘托', expected:260, actual:220, demand:260, opening:180, plannedArrival:90, actualArrival:50, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:119, marginRate:0.31},
+      {version:'202602', country:'US', month:'202603', category:'配件', sku:'显示器支架', expected:160, actual:175, demand:175, opening:120, plannedArrival:80, actualArrival:80, plannedKOL:0, actualKOL:0, plannedToB:10, actualToB:5, price:129, marginRate:0.28},
+      {version:'202602', country:'US', month:'202603', category:'整桌', sku:'L型整桌', expected:210, actual:180, demand:210, opening:180, plannedArrival:50, actualArrival:0, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:799, marginRate:0.26},
+
+      // 202602 - US - 202604
+      {version:'202602', country:'US', month:'202604', category:'整桌', sku:'V0.7L型整桌', expected:340, actual:340, demand:340, opening:260, plannedArrival:160, actualArrival:160, plannedKOL:15, actualKOL:15, plannedToB:70, actualToB:70, price:499, marginRate:0.22},
+      {version:'202602', country:'US', month:'202604', category:'整桌', sku:'V1.0行政桌', expected:295, actual:250, demand:295, opening:280, plannedArrival:60, actualArrival:60, plannedKOL:8, actualKOL:8, plannedToB:30, actualToB:30, price:699, marginRate:0.24},
+      {version:'202602', country:'US', month:'202604', category:'配件', sku:'V系列抽屉', expected:450, actual:420, demand:450, opening:210, plannedArrival:260, actualArrival:200, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:89, marginRate:0.34},
+      {version:'202602', country:'US', month:'202604', category:'配件', sku:'键盘托', expected:280, actual:260, demand:280, opening:140, plannedArrival:170, actualArrival:120, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:119, marginRate:0.31},
+      {version:'202602', country:'US', month:'202604', category:'配件', sku:'显示器支架', expected:175, actual:160, demand:175, opening:100, plannedArrival:90, actualArrival:90, plannedKOL:0, actualKOL:0, plannedToB:15, actualToB:15, price:129, marginRate:0.28},
+      {version:'202602', country:'US', month:'202604', category:'整桌', sku:'L型整桌', expected:230, actual:210, demand:230, opening:170, plannedArrival:80, actualArrival:80, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:799, marginRate:0.26},
+
+      // 202602 - UK
+      {version:'202602', country:'UK', month:'202603', category:'整桌', sku:'V0.7L型整桌', expected:180, actual:150, demand:180, opening:120, plannedArrival:80, actualArrival:40, plannedKOL:6, actualKOL:6, plannedToB:20, actualToB:20, price:479, marginRate:0.21},
+      {version:'202602', country:'UK', month:'202603', category:'整桌', sku:'V1.0行政桌', expected:130, actual:118, demand:130, opening:180, plannedArrival:30, actualArrival:30, plannedKOL:2, actualKOL:2, plannedToB:8, actualToB:8, price:679, marginRate:0.24},
+      {version:'202602', country:'UK', month:'202603', category:'配件', sku:'V系列抽屉', expected:190, actual:196, demand:196, opening:100, plannedArrival:120, actualArrival:120, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:85, marginRate:0.32},
+      {version:'202602', country:'UK', month:'202604', category:'整桌', sku:'V0.7L型整桌', expected:195, actual:195, demand:195, opening:200, plannedArrival:40, actualArrival:40, plannedKOL:5, actualKOL:5, plannedToB:18, actualToB:18, price:479, marginRate:0.21},
+      {version:'202602', country:'UK', month:'202604', category:'整桌', sku:'L型整桌', expected:120, actual:96, demand:120, opening:80, plannedArrival:40, actualArrival:0, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:759, marginRate:0.26},
+      {version:'202602', country:'UK', month:'202604', category:'配件', sku:'键盘托', expected:150, actual:138, demand:150, opening:140, plannedArrival:20, actualArrival:20, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:115, marginRate:0.30},
+
+      // 202603 - US
+      {version:'202603', country:'US', month:'202604', category:'整桌', sku:'V0.7L型整桌', expected:360, actual:350, demand:360, opening:220, plannedArrival:170, actualArrival:140, plannedKOL:18, actualKOL:18, plannedToB:90, actualToB:60, price:499, marginRate:0.22},
+      {version:'202603', country:'US', month:'202604', category:'整桌', sku:'V1.0行政桌', expected:310, actual:310, demand:310, opening:250, plannedArrival:100, actualArrival:100, plannedKOL:10, actualKOL:10, plannedToB:40, actualToB:40, price:699, marginRate:0.24},
+      {version:'202603', country:'US', month:'202604', category:'配件', sku:'V系列抽屉', expected:470, actual:430, demand:470, opening:180, plannedArrival:250, actualArrival:180, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:89, marginRate:0.34},
+      {version:'202603', country:'US', month:'202604', category:'整桌', sku:'L型整桌', expected:240, actual:220, demand:240, opening:140, plannedArrival:100, actualArrival:80, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:799, marginRate:0.26},
+      {version:'202603', country:'US', month:'202605', category:'整桌', sku:'V0.7L型整桌', expected:370, actual:330, demand:370, opening:160, plannedArrival:200, actualArrival:170, plannedKOL:18, actualKOL:30, plannedToB:95, actualToB:95, price:499, marginRate:0.22},
+      {version:'202603', country:'US', month:'202605', category:'整桌', sku:'V1.0行政桌', expected:320, actual:285, demand:320, opening:300, plannedArrival:70, actualArrival:70, plannedKOL:10, actualKOL:10, plannedToB:30, actualToB:30, price:699, marginRate:0.24},
+      {version:'202603', country:'US', month:'202605', category:'配件', sku:'键盘托', expected:290, actual:250, demand:290, opening:120, plannedArrival:150, actualArrival:130, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:119, marginRate:0.31},
+      {version:'202603', country:'US', month:'202605', category:'配件', sku:'显示器支架', expected:190, actual:190, demand:190, opening:120, plannedArrival:90, actualArrival:90, plannedKOL:0, actualKOL:0, plannedToB:12, actualToB:10, price:129, marginRate:0.28},
+
+      // 202603 - DE
+      {version:'202603', country:'DE', month:'202604', category:'整桌', sku:'V0.7L型整桌', expected:165, actual:150, demand:165, opening:90, plannedArrival:80, actualArrival:60, plannedKOL:5, actualKOL:5, plannedToB:15, actualToB:15, price:519, marginRate:0.23},
+      {version:'202603', country:'DE', month:'202604', category:'整桌', sku:'L型整桌', expected:140, actual:128, demand:140, opening:160, plannedArrival:20, actualArrival:20, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:829, marginRate:0.27},
+      {version:'202603', country:'DE', month:'202604', category:'配件', sku:'V系列抽屉', expected:150, actual:136, demand:150, opening:120, plannedArrival:30, actualArrival:30, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:95, marginRate:0.33},
+      {version:'202603', country:'DE', month:'202605', category:'整桌', sku:'V0.7L型整桌', expected:172, actual:172, demand:172, opening:130, plannedArrival:60, actualArrival:60, plannedKOL:5, actualKOL:5, plannedToB:15, actualToB:15, price:519, marginRate:0.23},
+      {version:'202603', country:'DE', month:'202605', category:'配件', sku:'键盘托', expected:120, actual:96, demand:120, opening:70, plannedArrival:50, actualArrival:30, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:125, marginRate:0.30}
+    ];
+
+    function computeRecord(d) {
+      const availablePlanned = d.opening + d.plannedArrival - d.plannedKOL - d.plannedToB;
+      const availableActual = d.opening + d.actualArrival - d.actualKOL - d.actualToB;
+      const ending = Math.max(availableActual - d.actual, 0);
+      const gap = d.expected - d.actual;
+      const belowExpected = d.actual < d.expected;
+      const stockout = belowExpected && ending === 0 && availableActual < d.expected;
+      const result = !belowExpected ? '达到/超过预计' : (stockout ? '断货导致未达预计' : '非断货未达预计');
+      const shortfall = stockout ? (d.expected - d.actual) : 0;
+
+      const arrivalShort = Math.max(d.plannedArrival - d.actualArrival, 0);
+      const kolOver = Math.max(d.actualKOL - d.plannedKOL, 0);
+      const tobOver = Math.max(d.actualToB - d.plannedToB, 0);
+      const plannedNeed = d.expected + d.plannedKOL + d.plannedToB;
+      const planInventoryShort = Math.max(plannedNeed - (d.opening + d.plannedArrival), 0);
+      const raw = [
+        { cause: '实际到货未达预期', value: arrivalShort },
+        { cause: 'KOL占用超计划', value: kolOver },
+        { cause: 'ToB占用超计划', value: tobOver },
+        { cause: '期初/计划库存不足', value: planInventoryShort }
+      ];
+      const totalRaw = raw.reduce((s, x) => s + x.value, 0);
+      let causeBreakdown = raw.map(x => ({...x, value: 0}));
+      if (stockout && shortfall > 0) {
+        if (totalRaw > 0) {
+          let allocated = 0;
+          causeBreakdown = raw.map((x, idx) => {
+            const val = idx === raw.length - 1 ? shortfall - allocated : Math.round(shortfall * x.value / totalRaw);
+            allocated += val;
+            return { cause: x.cause, value: Math.max(val, 0) };
+          });
+          const diff = shortfall - causeBreakdown.reduce((s, x) => s + x.value, 0);
+          causeBreakdown[causeBreakdown.length - 1].value += diff;
+        } else {
+          causeBreakdown = [{ cause: '期初/计划库存不足', value: shortfall }, { cause: '实际到货未达预期', value: 0 }, { cause: 'KOL占用超计划', value: 0 }, { cause: 'ToB占用超计划', value: 0 }];
+        }
+      }
+      const primaryCause = stockout ? causeBreakdown.slice().sort((a,b)=>b.value-a.value)[0].cause : '不适用';
+      const revenueLoss = shortfall * d.price;
+      const profitLoss = revenueLoss * d.marginRate;
+      const missGap = Math.max(d.expected - d.actual, 0);
+      return {
+        ...d,
+        availablePlanned,
+        availableActual,
+        ending,
+        gap,
+        belowExpected,
+        stockout,
+        result,
+        shortfall,
+        revenueLoss,
+        profitLoss,
+        causeBreakdown,
+        primaryCause,
+        executionOrForecast: (!stockout && belowExpected) ? '预测/执行偏差' : (stockout ? '断货导致' : '达到/超过预计')
+      };
+    }
+
+    const data = rawData.map(computeRecord);
+
+    const filters = {
+      version: '全部',
+      country: '全部',
+      month: '全部',
+      category: '全部',
+      sku: '全部',
+      result: '全部',
+      reasonClass: '全部',
+      cause: '全部',
+      selectedKey: null
+    };
+
+    const ids = {
+      version: document.getElementById('versionFilter'),
+      country: document.getElementById('countryFilter'),
+      month: document.getElementById('monthFilter'),
+      category: document.getElementById('categoryFilter'),
+      sku: document.getElementById('skuFilter'),
+      reset: document.getElementById('resetBtn')
+    };
+
+    const charts = {
+      resultBar: echarts.init(document.getElementById('resultBar')),
+      bubbleChart: echarts.init(document.getElementById('bubbleChart')),
+      reasonPie: echarts.init(document.getElementById('reasonPie')),
+      rankingBar: echarts.init(document.getElementById('rankingBar')),
+      causePie: echarts.init(document.getElementById('causePie')),
+      lossTrend: echarts.init(document.getElementById('lossTrend')),
+      causeScatter: echarts.init(document.getElementById('causeScatter'))
+    };
+
+    function uniq(arr, key) {
+      return ['全部', ...Array.from(new Set(arr.map(x => x[key]))).sort()];
+    }
+
+    function fillSelect(el, values) {
+      el.innerHTML = values.map(v => `<option value="${v}">${v}</option>`).join('');
+    }
+
+    fillSelect(ids.version, uniq(data,'version'));
+    fillSelect(ids.country, uniq(data,'country'));
+    fillSelect(ids.month, uniq(data,'month'));
+    fillSelect(ids.category, uniq(data,'category'));
+    fillSelect(ids.sku, uniq(data,'sku'));
+
+    ids.version.addEventListener('change', e => { filters.version = e.target.value; filters.selectedKey = null; render(); });
+    ids.country.addEventListener('change', e => { filters.country = e.target.value; filters.selectedKey = null; render(); });
+    ids.month.addEventListener('change', e => { filters.month = e.target.value; filters.selectedKey = null; render(); });
+    ids.category.addEventListener('change', e => { filters.category = e.target.value; filters.selectedKey = null; render(); });
+    ids.sku.addEventListener('change', e => { filters.sku = e.target.value; filters.selectedKey = null; render(); });
+    ids.reset.addEventListener('click', () => {
+      Object.assign(filters, { version:'全部', country:'全部', month:'全部', category:'全部', sku:'全部', result:'全部', reasonClass:'全部', cause:'全部', selectedKey:null });
+      ids.version.value = '全部'; ids.country.value='全部'; ids.month.value='全部'; ids.category.value='全部'; ids.sku.value='全部';
+      render();
+    });
+
+    function currentData() {
+      return data.filter(d =>
+        (filters.version === '全部' || d.version === filters.version) &&
+        (filters.country === '全部' || d.country === filters.country) &&
+        (filters.month === '全部' || d.month === filters.month) &&
+        (filters.category === '全部' || d.category === filters.category) &&
+        (filters.sku === '全部' || d.sku === filters.sku) &&
+        (filters.result === '全部' || d.result === filters.result) &&
+        (filters.reasonClass === '全部' || d.executionOrForecast === filters.reasonClass) &&
+        (filters.cause === '全部' || d.primaryCause === filters.cause) &&
+        (!filters.selectedKey || `${d.version}|${d.country}|${d.month}|${d.sku}` === filters.selectedKey)
+      );
+    }
+
+    function noSelectedDataFallback(base) {
+      return base.length ? base : data.filter(d =>
+        (filters.version === '全部' || d.version === filters.version) &&
+        (filters.country === '全部' || d.country === filters.country) &&
+        (filters.month === '全部' || d.month === filters.month) &&
+        (filters.category === '全部' || d.category === filters.category) &&
+        (filters.sku === '全部' || d.sku === filters.sku)
+      );
+    }
+
+    function fmtNum(n) { return n.toLocaleString('zh-CN'); }
+    function fmtPct(n) { return (n * 100).toFixed(2) + '%'; }
+    function fmtMoney(n) { return '$' + n.toLocaleString('en-US', { maximumFractionDigits: 0 }); }
+
+    function renderKPIs(base) {
+      const total = base.length;
+      const below = base.filter(d => d.belowExpected).length;
+      const stockoutCount = base.filter(d => d.stockout).length;
+      const stockoutQty = base.reduce((s,d)=>s+d.shortfall,0);
+      const revenueLoss = base.reduce((s,d)=>s+d.revenueLoss,0);
+      const profitLoss = base.reduce((s,d)=>s+d.profitLoss,0);
+      const avgGap = total ? base.reduce((s,d)=>s+d.gap,0)/total : 0;
+      const html = [
+        ['样本数', fmtNum(total), '当前筛选范围内的版本×国家×月份×SKU 记录数'],
+        ['未达预计样本', fmtNum(below), `占比 ${(total? below/total:0*100).toFixed? ((below/(total||1))*100).toFixed(1):0}%`],
+        ['断货样本数', fmtNum(stockoutCount), '满足“期末库存=0且可卖库存不足”的样本数'],
+        ['断货量', fmtNum(stockoutQty), '所有断货样本的销量损失合计'],
+        ['收入损失', fmtMoney(revenueLoss), '断货量 × 单价'],
+        ['利润损失', fmtMoney(profitLoss), '收入损失 × 运营利润率']
+      ].map(([label, value, note]) => `<div class="kpi"><div class="label">${label}</div><div class="value">${value}</div><div class="note">${note}</div></div>`).join('');
+      document.getElementById('kpiGrid').innerHTML = html;
+    }
+
+    function renderBreadcrumbs() {
+      const crumbs = [
+        `版本：${filters.version}`,
+        `国家：${filters.country}`,
+        `月份：${filters.month}`,
+        `品类：${filters.category}`,
+        `SKU：${filters.sku}`
+      ];
+      if (filters.result !== '全部') crumbs.push(`结果聚焦：${filters.result}`);
+      if (filters.reasonClass !== '全部') crumbs.push(`第二层聚焦：${filters.reasonClass}`);
+      if (filters.cause !== '全部') crumbs.push(`第三层聚焦：${filters.cause}`);
+      if (filters.selectedKey) crumbs.push('已选中单条样本');
+      document.getElementById('breadcrumbs').innerHTML = crumbs.map(x => `<span class="crumb">${x}</span>`).join('');
+    }
+
+    function renderLevel1(base) {
+      const resultMap = ['达到/超过预计','非断货未达预计','断货导致未达预计'].map(name => ({ name, value: base.filter(d => d.result === name).length }));
+      charts.resultBar.setOption({
+        tooltip: {
+          trigger: 'axis',
+          formatter: params => {
+            const p = params[0];
+            const count = p.value;
+            const ratio = base.length ? (count/base.length*100).toFixed(1) : 0;
+            return `${p.axisValue}<br/>样本数：${count}<br/>占比：${ratio}%<br/><span style="color:#667085">点击柱形可聚焦该结果分类</span>`;
+          }
+        },
+        grid: { left: 48, right: 24, top: 40, bottom: 50 },
+        xAxis: { type: 'category', data: resultMap.map(x=>x.name), axisLabel: { interval: 0 } },
+        yAxis: { type: 'value', name: '样本数' },
+        series: [{
+          type: 'bar',
+          data: resultMap.map(x => ({ value: x.value, itemStyle: { color: x.name === '断货导致未达预计' ? '#dc2626' : (x.name === '非断货未达预计' ? '#d97706' : '#16a34a') }, name: x.name })),
+          label: { show: true, position: 'top', formatter: '{c}' },
+          barWidth: 56
+        }]
+      });
+      charts.resultBar.off('click');
+      charts.resultBar.on('click', params => {
+        filters.result = params.name;
+        filters.reasonClass = '全部';
+        filters.cause = '全部';
+        filters.selectedKey = null;
+        render();
+      });
+
+      charts.bubbleChart.setOption({
+        tooltip: {
+          formatter: p => {
+            const d = p.data.raw;
+            return `${d.sku}<br/>版本：${d.version}｜国家：${d.country}｜月份：${d.month}<br/>预计销量：${fmtNum(d.expected)}<br/>实际销量：${fmtNum(d.actual)}<br/>实际可卖库存：${fmtNum(d.availableActual)}<br/>期末库存：${fmtNum(d.ending)}<br/>判断结果：${d.result}<br/>收入损失：${fmtMoney(d.revenueLoss)}<br/><span style="color:#667085">点击气泡可锁定单条样本</span>`;
+          }
+        },
+        xAxis: { type: 'value', name: '预计销量' },
+        yAxis: { type: 'value', name: '实际销量' },
+        grid: { left: 55, right: 30, top: 40, bottom: 55 },
+        series: [{
+          type: 'scatter',
+          symbolSize: val => Math.max(18, Math.sqrt(val[2]) * 0.8 + 10),
+          data: base.map(d => ({
+            value: [d.expected, d.actual, d.revenueLoss || 1],
+            raw: d,
+            itemStyle: { color: d.stockout ? '#dc2626' : (d.belowExpected ? '#d97706' : '#16a34a') },
+            label: { show: true, formatter: d.sku.length > 8 ? d.sku.slice(0,8)+'…' : d.sku, position: 'top' }
+          }))
+        }],
+        graphic: [{ type:'text', left:'center', top:10, style:{ text:'对角线以下为“实际低于预计”的样本', fill:'#667085', fontSize:12 }}]
+      });
+      charts.bubbleChart.off('click');
+      charts.bubbleChart.on('click', p => {
+        filters.selectedKey = `${p.data.raw.version}|${p.data.raw.country}|${p.data.raw.month}|${p.data.raw.sku}`;
+        render();
+      });
+
+      const rows = base.slice().sort((a,b)=>b.revenueLoss-a.revenueLoss).map(d => `
+        <tr data-key="${d.version}|${d.country}|${d.month}|${d.sku}">
+          <td>${d.version}</td>
+          <td>${d.country}</td>
+          <td>${d.month}</td>
+          <td>${d.category}</td>
+          <td>${d.sku}</td>
+          <td>${fmtNum(d.expected)}</td>
+          <td>${fmtNum(d.actual)}</td>
+          <td>${fmtNum(d.availableActual)}</td>
+          <td>${fmtNum(d.ending)}</td>
+          <td><span class="tag ${d.stockout ? 'stockout' : (d.belowExpected ? 'warning' : 'no-stockout')}">${d.result}</span></td>
+          <td>${fmtNum(d.shortfall)}</td>
+          <td>${fmtMoney(d.revenueLoss)}</td>
+        </tr>
+      `).join('');
+      document.getElementById('level1Table').innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>版本号</th><th>国家</th><th>月份</th><th>品类</th><th>SKU</th><th>预计销量</th><th>实际销量</th><th>实际可卖库存</th><th>期末库存</th><th>判断结果</th><th>断货量</th><th>收入损失</th>
+            </tr>
+          </thead>
+          <tbody>${rows || '<tr><td colspan="12">当前筛选无数据</td></tr>'}</tbody>
+        </table>
+        <div class="explain">说明：这一层先回答“到底有没有断货”。若实际销量低于预计销量，但期末库存不为 0，或实际可卖库存仍高于预计销量，则不能直接归为断货；这类样本更可能是预测偏差或销售执行偏差。</div>
+      `;
+      document.querySelectorAll('#level1Table tr[data-key]').forEach(tr => tr.addEventListener('click', () => {
+        filters.selectedKey = tr.getAttribute('data-key');
+        render();
+      }));
+    }
+
+    function renderLevel2(base) {
+      const misses = base.filter(d => d.belowExpected);
+      const reasonMap = [
+        { name: '预测/执行偏差', value: misses.filter(d => !d.stockout).length },
+        { name: '断货导致', value: misses.filter(d => d.stockout).length }
+      ];
+      charts.reasonPie.setOption({
+        tooltip: { formatter: p => `${p.name}<br/>样本数：${p.value}<br/>占比：${p.percent}%<br/><span style="color:#667085">点击扇区可聚焦此类原因</span>` },
+        series: [{
+          type: 'pie',
+          radius: ['38%', '68%'],
+          center: ['50%','55%'],
+          itemStyle: { borderColor:'#fff', borderWidth:2 },
+          label: { show: true, formatter: '{b}\n{c}个 / {d}%' },
+          data: reasonMap.map(x => ({ ...x, itemStyle: { color: x.name === '断货导致' ? '#dc2626' : '#d97706' } }))
+        }]
+      });
+      charts.reasonPie.off('click');
+      charts.reasonPie.on('click', p => { filters.reasonClass = p.name; filters.cause = '全部'; filters.selectedKey = null; render(); });
+
+      const rankingBase = misses.slice().sort((a,b)=> (b.expected-b.actual)-(a.expected-a.actual)).slice(0,10);
+      charts.rankingBar.setOption({
+        tooltip: {
+          trigger:'axis',
+          formatter: params => {
+            const p = params[0];
+            const d = p.data.raw;
+            return `${d.sku}<br/>版本：${d.version}｜国家：${d.country}｜月份：${d.month}<br/>预计：${fmtNum(d.expected)}｜实际：${fmtNum(d.actual)}<br/>差额：${fmtNum(d.expected-d.actual)}<br/>分类：${d.executionOrForecast}<br/>期末库存：${fmtNum(d.ending)}<br/><span style="color:#667085">点击条形可锁定该 SKU 样本</span>`;
+          }
+        },
+        grid:{ left: 120, right: 20, top: 20, bottom: 35 },
+        xAxis:{ type:'value', name:'销量缺口' },
+        yAxis:{ type:'category', data: rankingBase.map(d=>`${d.sku}｜${d.country}`), inverse:true, axisLabel:{ width:100, overflow:'truncate' } },
+        series:[{
+          type:'bar',
+          data: rankingBase.map(d => ({ value: d.expected-d.actual, raw: d, itemStyle:{ color: d.stockout ? '#dc2626' : '#d97706' } })),
+          label:{ show:true, position:'right', formatter:'{c}' }
+        }]
+      });
+      charts.rankingBar.off('click');
+      charts.rankingBar.on('click', p => { const d = p.data.raw; filters.selectedKey = `${d.version}|${d.country}|${d.month}|${d.sku}`; render(); });
+
+      const non = misses.find(d => !d.stockout);
+      const sto = misses.find(d => d.stockout);
+      document.getElementById('caseExplain').innerHTML = `
+        <table>
+          <thead><tr><th>案例类型</th><th>案例</th><th>核心数字</th><th>解释</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>非断货未达预计</td>
+              <td>${non ? `${non.country}｜${non.month}｜${non.sku}` : '-'}</td>
+              <td>${non ? `预计${fmtNum(non.expected)} / 实际${fmtNum(non.actual)} / 可卖${fmtNum(non.availableActual)} / 期末${fmtNum(non.ending)}` : '-'}</td>
+              <td>${non ? `该样本实际销量低于预计，但期末库存为 ${fmtNum(non.ending)}，说明“有货未卖完”，不能定义为断货，应优先判断为预测偏差或执行偏差。` : '-'}</td>
+            </tr>
+            <tr>
+              <td>断货导致</td>
+              <td>${sto ? `${sto.country}｜${sto.month}｜${sto.sku}` : '-'}</td>
+              <td>${sto ? `预计${fmtNum(sto.expected)} / 实际${fmtNum(sto.actual)} / 可卖${fmtNum(sto.availableActual)} / 期末${fmtNum(sto.ending)}` : '-'}</td>
+              <td>${sto ? `该样本期末库存为 0，且实际可卖库存仅 ${fmtNum(sto.availableActual)}，不足以支撑预计销量 ${fmtNum(sto.expected)}，因此可认定为断货，断货量为 ${fmtNum(sto.shortfall)}。` : '-'}</td>
+            </tr>
+          </tbody>
+        </table>
+      `;
+
+      const missTotal = misses.length;
+      const missGapTotal = misses.reduce((s,d)=>s+(d.expected-d.actual),0);
+      const stockGap = misses.filter(d=>d.stockout).reduce((s,d)=>s+d.shortfall,0);
+      const nonGap = misses.filter(d=>!d.stockout).reduce((s,d)=>s+(d.expected-d.actual),0);
+      document.getElementById('level2Narrative').innerHTML = missTotal ?
+        `当前筛选范围内共有 <b>${fmtNum(missTotal)}</b> 个“实际未达预计”样本，累计销量缺口 <b>${fmtNum(missGapTotal)}</b> 件。其中，真正由断货导致的缺口为 <b>${fmtNum(stockGap)}</b> 件，占全部未达预计缺口的 <b>${((stockGap/(missGapTotal||1))*100).toFixed(1)}%</b>；其余 <b>${fmtNum(nonGap)}</b> 件属于“有货未卖完”，更应从预测精度、流量、转化、价格执行等经营因素解释。` : '当前筛选范围内没有“实际未达预计”的样本，第二层无须继续拆解。';
+    }
+
+    function renderLevel3(base) {
+      const stockouts = base.filter(d => d.stockout);
+      const causeAgg = {};
+      stockouts.forEach(d => d.causeBreakdown.forEach(c => { causeAgg[c.cause] = (causeAgg[c.cause] || 0) + c.value; }));
+      const causeData = Object.entries(causeAgg).map(([name, value]) => ({ name, value })).sort((a,b)=>b.value-a.value);
+      charts.causePie.setOption({
+        tooltip: { formatter: p => `${p.name}<br/>断货量：${fmtNum(p.value)}件<br/>占比：${p.percent}%<br/><span style="color:#667085">点击扇区可聚焦该断货原因</span>` },
+        series: [{ type:'pie', radius:['35%','70%'], center:['50%','55%'], label:{ show:true, formatter:'{b}\n{c}件 / {d}%' }, data: causeData }]
+      });
+      charts.causePie.off('click');
+      charts.causePie.on('click', p => { filters.cause = p.name; filters.selectedKey = null; render(); });
+
+      const monthAgg = {};
+      stockouts.forEach(d => {
+        monthAgg[d.month] = monthAgg[d.month] || { revenueLoss:0, profitLoss:0 };
+        monthAgg[d.month].revenueLoss += d.revenueLoss;
+        monthAgg[d.month].profitLoss += d.profitLoss;
+      });
+      const months = Object.keys(monthAgg).sort();
+      charts.lossTrend.setOption({
+        tooltip: { trigger:'axis', formatter: params => `${params[0].axisValue}<br/>收入损失：${fmtMoney(params[0].value)}<br/>利润损失：${fmtMoney(params[1].value)}` },
+        legend: { top: 10 },
+        grid:{ left:60, right:25, top:50, bottom:40 },
+        xAxis:{ type:'category', data:months },
+        yAxis:{ type:'value', name:'金额' },
+        series:[
+          { name:'收入损失', type:'bar', data: months.map(m=>monthAgg[m].revenueLoss), label:{ show:true, position:'top', formatter: p => p.value ? Math.round(p.value/1000)+'k' : '0' } },
+          { name:'利润损失', type:'line', data: months.map(m=>monthAgg[m].profitLoss), label:{ show:true, formatter: p => p.value ? Math.round(p.value/1000)+'k' : '0' } }
+        ]
+      });
+
+      charts.causeScatter.setOption({
+        tooltip: { formatter: p => {
+          const d = p.data.raw;
+          return `${d.sku}<br/>版本：${d.version}｜国家：${d.country}｜月份：${d.month}<br/>断货量：${fmtNum(d.shortfall)}件<br/>收入损失：${fmtMoney(d.revenueLoss)}<br/>主要原因：${d.primaryCause}<br/>到货计划/实际：${fmtNum(d.plannedArrival)} / ${fmtNum(d.actualArrival)}<br/>KOL 计划/实际：${fmtNum(d.plannedKOL)} / ${fmtNum(d.actualKOL)}<br/>ToB 计划/实际：${fmtNum(d.plannedToB)} / ${fmtNum(d.actualToB)}`;
+        }},
+        grid:{ left:60, right:25, top:30, bottom:50 },
+        xAxis:{ type:'value', name:'断货量' },
+        yAxis:{ type:'value', name:'收入损失' },
+        series:[{
+          type:'scatter',
+          data: stockouts.map(d => ({ value:[d.shortfall, d.revenueLoss], raw:d, itemStyle:{ color: d.primaryCause.includes('到货') ? '#dc2626' : d.primaryCause.includes('KOL') ? '#7c3aed' : d.primaryCause.includes('ToB') ? '#2563eb' : '#d97706' }, label:{ show:true, formatter: d.sku.length>8? d.sku.slice(0,8)+'…' : d.sku, position:'top' } })),
+          symbolSize: p => Math.max(16, Math.sqrt(p[1]/1000) * 4)
+        }]
+      });
+
+      const rows = stockouts.slice().sort((a,b)=>b.revenueLoss-a.revenueLoss).map(d => `
+        <tr>
+          <td>${d.version}</td><td>${d.country}</td><td>${d.month}</td><td>${d.sku}</td>
+          <td>${fmtNum(d.shortfall)}</td>
+          <td>${d.primaryCause}</td>
+          <td>${d.causeBreakdown.map(c => `${c.cause}:${fmtNum(c.value)}`).join('；')}</td>
+          <td>${fmtMoney(d.revenueLoss)}</td>
+          <td>${fmtMoney(d.profitLoss)}</td>
+        </tr>
+      `).join('');
+      document.getElementById('level3Table').innerHTML = `
+        <table>
+          <thead><tr><th>版本号</th><th>国家</th><th>月份</th><th>SKU</th><th>断货量</th><th>主要原因</th><th>原因拆解</th><th>收入损失</th><th>利润损失</th></tr></thead>
+          <tbody>${rows || '<tr><td colspan="9">当前筛选范围内没有断货样本</td></tr>'}</tbody>
+        </table>
+      `;
+
+      const totalShort = stockouts.reduce((s,d)=>s+d.shortfall,0);
+      const topCause = causeData[0];
+      document.getElementById('level3Narrative').innerHTML = stockouts.length ?
+        `当前范围内共有 <b>${fmtNum(stockouts.length)}</b> 个断货样本，累计断货量 <b>${fmtNum(totalShort)}</b> 件。断货最主要的驱动因素为 <b>${topCause ? topCause.name : '-'}</b>，贡献断货量 <b>${topCause ? fmtNum(topCause.value) : 0}</b> 件，占全部断货量的 <b>${topCause ? ((topCause.value/(totalShort||1))*100).toFixed(1) : 0}%</b>。这说明当前最需要优先修复的不是“卖不动”，而是供应兑现、占用控制或库存计划设置。` : '当前筛选范围内没有断货样本，第三层无需继续拆解。';
+      document.getElementById('formulaExplain').innerHTML = `<b>口径说明</b><br/>1）可卖库存 = 期初库存 + 实际到货 - 实际 KOL 占用 - 实际 ToB 占用；<br/>2）若实际销量 &lt; 预计销量，且期末库存 = 0，同时可卖库存不足预计销量，则定义为断货；<br/>3）断货量 = 预计销量 - 实际销量；<br/>4）收入损失 = 断货量 × 单价；利润损失 = 收入损失 × 运营利润率。`;
+      const selected = stockouts[0];
+      document.getElementById('selectedExplain').innerHTML = selected ? `<b>示例解释</b><br/>以 <b>${selected.country}｜${selected.month}｜${selected.sku}</b> 为例：预计销量 ${fmtNum(selected.expected)}，实际销量 ${fmtNum(selected.actual)}，可卖库存仅 ${fmtNum(selected.availableActual)}，且期末库存为 0，因此断货量为 ${fmtNum(selected.shortfall)}。其主要原因是 <b>${selected.primaryCause}</b>，对应收入损失 ${fmtMoney(selected.revenueLoss)}。` : '<b>示例解释</b><br/>当前无断货样本。';
+    }
+
+    function render() {
+      renderBreadcrumbs();
+      const base = noSelectedDataFallback(currentData());
+      renderKPIs(base);
+      renderLevel1(base);
+      renderLevel2(base);
+      renderLevel3(base);
+      window.dispatchEvent(new Event('resize'));
+    }
+
+    window.addEventListener('resize', () => Object.values(charts).forEach(c => c.resize()));
+    render();
+  </script>
+</body>
+</html>
