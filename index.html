@@ -261,7 +261,7 @@
     <div class="hero">
       <h1>断货影响拆解看板 Demo</h1>
       <p>
-        本 demo 将“断货影响拆解”分为三层：第一层先判断“实际未达预计”是否由断货导致；第二层将未达预计拆分为“预测/执行偏差”与“断货导致”；第三层只对断货样本继续拆解断货来源（到货未达预期、KOL 占用、ToB 占用、计划库存不足）并测算收入/利润损失。所有图表均支持悬停查看更多信息，点击图表可逐层下钻，表格会同步刷新。
+        本 demo 将“断货影响拆解”分为三层：第一层先判断“实际未达预计”是否由断货导致；第二层将未达预计拆分为“预测/执行偏差”与“断货导致”；第三层只对断货款式(YSPU)继续拆解断货来源（到货未达预期、KOL 占用、ToB 占用、计划库存不足）并测算收入/利润损失。所有图表均支持悬停查看更多信息，点击图表可逐层下钻，表格会同步刷新。
       </p>
     </div>
 
@@ -283,7 +283,7 @@
         <div>
           <h2 class="section-title">第一层：结果判断</h2>
           <div class="section-desc">
-            先判断“实际销量低于预计销量”的样本中，哪些属于真正的断货，哪些只是预测偏差或销售执行偏差。判断规则：若实际销量低于预计销量，且期末库存为 0，同时实际可卖库存小于预计销量，则认定为断货；否则先归为“非断货未达预计”。点击柱形或散点可继续下钻。
+            先判断“实际销量低于预计销量”的YSPU中，哪些YSPU属于真正的断货，哪些YSPU只是预测偏差或销售执行偏差。判断规则：若实际销量低于预计销量，且期末库存为 0，同时实际可卖库存小于预计销量，则认定为断货；否则先归为“非断货未达预计”。点击柱形或散点可继续下钻。
           </div>
         </div>
       </div>
@@ -291,14 +291,14 @@
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">① 结果分类分布</h3>
-            <p class="card-desc">展示当前筛选范围内各 SKU 月份样本的判断结果。点击某一类，可在后续模块中聚焦查看该类样本。</p>
+            <p class="card-desc">展示当前筛选范围内各 YSPU 的判断结果。点击某一类，可在后续模块中聚焦查看该YSPU。</p>
           </div>
           <div class="chart" id="resultBar"></div>
         </div>
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">② 预计 vs 实际 × 期末库存</h3>
-            <p class="card-desc">横轴为预计销量，纵轴为实际销量，气泡大小表示收入损失，颜色表示判断结果。虚线以下是“实际低于预计”的样本，期末库存为 0 且可卖库存不足的样本才是断货。</p>
+            <p class="card-desc">横轴为预计销量，纵轴为实际销量，气泡大小表示收入损失，颜色表示判断结果。虚线以下是“实际低于预计”的YSPU，期末库存为 0 且可卖库存不足的YSPU才是断货。</p>
           </div>
           <div class="chart" id="bubbleChart"></div>
         </div>
@@ -317,21 +317,21 @@
         <div>
           <h2 class="section-title">第二层：未达预计原因分类</h2>
           <div class="section-desc">
-            仅针对“实际销量低于预计销量”的样本，继续区分：一类是“有货未卖完”，通常对应预测偏差或执行偏差；另一类是“断货导致”，即有需求但没货卖。此层帮助回答：销量没达标，到底是没卖动，还是没货卖。点击原因分类或 SKU 排名，可继续进入第三层断货原因拆解。</div>
+            仅针对“实际销量低于预计销量”的YSPU，继续区分：一类是“有货未卖完”，通常对应预测偏差或执行偏差；另一类是“断货导致”，即有需求但没货卖。此层帮助回答：销量没达标，到底是没卖动，还是没货卖。点击原因分类或 YSPU 排名，可继续进入第三层断货原因拆解。</div>
         </div>
       </div>
       <div class="grid-2">
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">① 未达预计原因占比</h3>
-            <p class="card-desc">仅统计“实际销量低于预计销量”的样本。点击扇区可锁定查看某一类原因。</p>
+            <p class="card-desc">仅统计“实际销量低于预计销量”的YSPU。点击扇区可锁定查看某一类原因。</p>
           </div>
           <div class="chart" id="reasonPie"></div>
         </div>
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">② 未达预计 SKU 排名</h3>
-            <p class="card-desc">按销量缺口排序，帮助快速定位影响最大的 SKU。颜色区分“断货导致”与“非断货未达预计”。点击某个 SKU 可查看第三层更细原因。</p>
+            <p class="card-desc">按销量缺口排序，帮助快速定位影响最大的 YSPU。颜色区分“断货导致”与“非断货未达预计”。点击某个 YSPU 可查看第三层更细原因。</p>
           </div>
           <div class="chart tall" id="rankingBar"></div>
         </div>
@@ -368,7 +368,7 @@
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">① 断货原因结构</h3>
-            <p class="card-desc">按断货量贡献拆分原因。点击某原因可查看对应 SKU 与损失明细。</p>
+            <p class="card-desc">按断货量贡献拆分原因。点击某原因可查看对应 YSPU 与损失明细。</p>
           </div>
           <div class="chart" id="causePie"></div>
         </div>
@@ -420,43 +420,43 @@
     const rawData = [
       // 202602 - US - 202603 examples around v0.7L
       {version:'202602', country:'US', month:'202603', category:'整桌', sku:'V0.7L型整桌', expected:312, actual:300, demand:312, opening:300, plannedArrival:200, actualArrival:200, plannedKOL:12, actualKOL:12, plannedToB:60, actualToB:60, price:499, marginRate:0.22},
-      {version:'202602', country:'US', month:'202603', category:'整桌', sku:'V1.0行政桌', expected:280, actual:280, demand:280, opening:350, plannedArrival:80, actualArrival:80, plannedKOL:5, actualKOL:5, plannedToB:20, actualToB:20, price:699, marginRate:0.24},
+      {version:'202602', country:'US', month:'202603', category:'整桌', sku:'V0.7L型行政桌', expected:280, actual:280, demand:280, opening:350, plannedArrival:80, actualArrival:80, plannedKOL:5, actualKOL:5, plannedToB:20, actualToB:20, price:699, marginRate:0.24},
       {version:'202602', country:'US', month:'202603', category:'配件', sku:'V系列抽屉', expected:420, actual:390, demand:420, opening:250, plannedArrival:200, actualArrival:200, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:89, marginRate:0.34},
       {version:'202602', country:'US', month:'202603', category:'配件', sku:'键盘托', expected:260, actual:220, demand:260, opening:180, plannedArrival:90, actualArrival:50, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:119, marginRate:0.31},
       {version:'202602', country:'US', month:'202603', category:'配件', sku:'显示器支架', expected:160, actual:175, demand:175, opening:120, plannedArrival:80, actualArrival:80, plannedKOL:0, actualKOL:0, plannedToB:10, actualToB:5, price:129, marginRate:0.28},
-      {version:'202602', country:'US', month:'202603', category:'整桌', sku:'L型整桌', expected:210, actual:180, demand:210, opening:180, plannedArrival:50, actualArrival:0, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:799, marginRate:0.26},
+      {version:'202602', country:'US', month:'202603', category:'整桌', sku:'V0.7一型整桌', expected:210, actual:180, demand:210, opening:180, plannedArrival:50, actualArrival:0, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:799, marginRate:0.26},
 
       // 202602 - US - 202604
       {version:'202602', country:'US', month:'202604', category:'整桌', sku:'V0.7L型整桌', expected:340, actual:340, demand:340, opening:260, plannedArrival:160, actualArrival:160, plannedKOL:15, actualKOL:15, plannedToB:70, actualToB:70, price:499, marginRate:0.22},
-      {version:'202602', country:'US', month:'202604', category:'整桌', sku:'V1.0行政桌', expected:295, actual:250, demand:295, opening:280, plannedArrival:60, actualArrival:60, plannedKOL:8, actualKOL:8, plannedToB:30, actualToB:30, price:699, marginRate:0.24},
+      {version:'202602', country:'US', month:'202604', category:'整桌', sku:'V0.7L型行政桌', expected:295, actual:250, demand:295, opening:280, plannedArrival:60, actualArrival:60, plannedKOL:8, actualKOL:8, plannedToB:30, actualToB:30, price:699, marginRate:0.24},
       {version:'202602', country:'US', month:'202604', category:'配件', sku:'V系列抽屉', expected:450, actual:420, demand:450, opening:210, plannedArrival:260, actualArrival:200, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:89, marginRate:0.34},
       {version:'202602', country:'US', month:'202604', category:'配件', sku:'键盘托', expected:280, actual:260, demand:280, opening:140, plannedArrival:170, actualArrival:120, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:119, marginRate:0.31},
       {version:'202602', country:'US', month:'202604', category:'配件', sku:'显示器支架', expected:175, actual:160, demand:175, opening:100, plannedArrival:90, actualArrival:90, plannedKOL:0, actualKOL:0, plannedToB:15, actualToB:15, price:129, marginRate:0.28},
-      {version:'202602', country:'US', month:'202604', category:'整桌', sku:'L型整桌', expected:230, actual:210, demand:230, opening:170, plannedArrival:80, actualArrival:80, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:799, marginRate:0.26},
+      {version:'202602', country:'US', month:'202604', category:'整桌', sku:'V0.7一型整桌', expected:230, actual:210, demand:230, opening:170, plannedArrival:80, actualArrival:80, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:799, marginRate:0.26},
 
       // 202602 - UK
       {version:'202602', country:'UK', month:'202603', category:'整桌', sku:'V0.7L型整桌', expected:180, actual:150, demand:180, opening:120, plannedArrival:80, actualArrival:40, plannedKOL:6, actualKOL:6, plannedToB:20, actualToB:20, price:479, marginRate:0.21},
-      {version:'202602', country:'UK', month:'202603', category:'整桌', sku:'V1.0行政桌', expected:130, actual:118, demand:130, opening:180, plannedArrival:30, actualArrival:30, plannedKOL:2, actualKOL:2, plannedToB:8, actualToB:8, price:679, marginRate:0.24},
+      {version:'202602', country:'UK', month:'202603', category:'整桌', sku:'V0.7L型行政桌', expected:130, actual:118, demand:130, opening:180, plannedArrival:30, actualArrival:30, plannedKOL:2, actualKOL:2, plannedToB:8, actualToB:8, price:679, marginRate:0.24},
       {version:'202602', country:'UK', month:'202603', category:'配件', sku:'V系列抽屉', expected:190, actual:196, demand:196, opening:100, plannedArrival:120, actualArrival:120, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:85, marginRate:0.32},
-      {version:'202602', country:'UK', month:'202604', category:'整桌', sku:'V0.7L型整桌', expected:195, actual:195, demand:195, opening:200, plannedArrival:40, actualArrival:40, plannedKOL:5, actualKOL:5, plannedToB:18, actualToB:18, price:479, marginRate:0.21},
+      {version:'202602', country:'UK', month:'202604', category:'整桌', sku:'V0.7一型整桌', expected:195, actual:195, demand:195, opening:200, plannedArrival:40, actualArrival:40, plannedKOL:5, actualKOL:5, plannedToB:18, actualToB:18, price:479, marginRate:0.21},
       {version:'202602', country:'UK', month:'202604', category:'整桌', sku:'L型整桌', expected:120, actual:96, demand:120, opening:80, plannedArrival:40, actualArrival:0, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:759, marginRate:0.26},
       {version:'202602', country:'UK', month:'202604', category:'配件', sku:'键盘托', expected:150, actual:138, demand:150, opening:140, plannedArrival:20, actualArrival:20, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:115, marginRate:0.30},
 
       // 202603 - US
       {version:'202603', country:'US', month:'202604', category:'整桌', sku:'V0.7L型整桌', expected:360, actual:350, demand:360, opening:220, plannedArrival:170, actualArrival:140, plannedKOL:18, actualKOL:18, plannedToB:90, actualToB:60, price:499, marginRate:0.22},
-      {version:'202603', country:'US', month:'202604', category:'整桌', sku:'V1.0行政桌', expected:310, actual:310, demand:310, opening:250, plannedArrival:100, actualArrival:100, plannedKOL:10, actualKOL:10, plannedToB:40, actualToB:40, price:699, marginRate:0.24},
+      {version:'202603', country:'US', month:'202604', category:'整桌', sku:'V0.7L型行政桌', expected:310, actual:310, demand:310, opening:250, plannedArrival:100, actualArrival:100, plannedKOL:10, actualKOL:10, plannedToB:40, actualToB:40, price:699, marginRate:0.24},
       {version:'202603', country:'US', month:'202604', category:'配件', sku:'V系列抽屉', expected:470, actual:430, demand:470, opening:180, plannedArrival:250, actualArrival:180, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:89, marginRate:0.34},
-      {version:'202603', country:'US', month:'202604', category:'整桌', sku:'L型整桌', expected:240, actual:220, demand:240, opening:140, plannedArrival:100, actualArrival:80, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:799, marginRate:0.26},
-      {version:'202603', country:'US', month:'202605', category:'整桌', sku:'V0.7L型整桌', expected:370, actual:330, demand:370, opening:160, plannedArrival:200, actualArrival:170, plannedKOL:18, actualKOL:30, plannedToB:95, actualToB:95, price:499, marginRate:0.22},
-      {version:'202603', country:'US', month:'202605', category:'整桌', sku:'V1.0行政桌', expected:320, actual:285, demand:320, opening:300, plannedArrival:70, actualArrival:70, plannedKOL:10, actualKOL:10, plannedToB:30, actualToB:30, price:699, marginRate:0.24},
+      {version:'202603', country:'US', month:'202604', category:'整桌', sku:'v0.6L型整桌', expected:240, actual:220, demand:240, opening:140, plannedArrival:100, actualArrival:80, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:799, marginRate:0.26},
+      {version:'202603', country:'US', month:'202605', category:'整桌', sku:'V0.7一型整桌', expected:370, actual:330, demand:370, opening:160, plannedArrival:200, actualArrival:170, plannedKOL:18, actualKOL:30, plannedToB:95, actualToB:95, price:499, marginRate:0.22},
+      {version:'202603', country:'US', month:'202605', category:'整桌', sku:'V0.7一型行政桌', expected:320, actual:285, demand:320, opening:300, plannedArrival:70, actualArrival:70, plannedKOL:10, actualKOL:10, plannedToB:30, actualToB:30, price:699, marginRate:0.24},
       {version:'202603', country:'US', month:'202605', category:'配件', sku:'键盘托', expected:290, actual:250, demand:290, opening:120, plannedArrival:150, actualArrival:130, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:119, marginRate:0.31},
       {version:'202603', country:'US', month:'202605', category:'配件', sku:'显示器支架', expected:190, actual:190, demand:190, opening:120, plannedArrival:90, actualArrival:90, plannedKOL:0, actualKOL:0, plannedToB:12, actualToB:10, price:129, marginRate:0.28},
 
       // 202603 - DE
       {version:'202603', country:'DE', month:'202604', category:'整桌', sku:'V0.7L型整桌', expected:165, actual:150, demand:165, opening:90, plannedArrival:80, actualArrival:60, plannedKOL:5, actualKOL:5, plannedToB:15, actualToB:15, price:519, marginRate:0.23},
-      {version:'202603', country:'DE', month:'202604', category:'整桌', sku:'L型整桌', expected:140, actual:128, demand:140, opening:160, plannedArrival:20, actualArrival:20, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:829, marginRate:0.27},
+      {version:'202603', country:'DE', month:'202604', category:'整桌', sku:'V0.7L型整桌', expected:140, actual:128, demand:140, opening:160, plannedArrival:20, actualArrival:20, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:829, marginRate:0.27},
       {version:'202603', country:'DE', month:'202604', category:'配件', sku:'V系列抽屉', expected:150, actual:136, demand:150, opening:120, plannedArrival:30, actualArrival:30, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:95, marginRate:0.33},
-      {version:'202603', country:'DE', month:'202605', category:'整桌', sku:'V0.7L型整桌', expected:172, actual:172, demand:172, opening:130, plannedArrival:60, actualArrival:60, plannedKOL:5, actualKOL:5, plannedToB:15, actualToB:15, price:519, marginRate:0.23},
+      {version:'202603', country:'DE', month:'202605', category:'整桌', sku:'V0.7一型整桌', expected:172, actual:172, demand:172, opening:130, plannedArrival:60, actualArrival:60, plannedKOL:5, actualKOL:5, plannedToB:15, actualToB:15, price:519, marginRate:0.23},
       {version:'202603', country:'DE', month:'202605', category:'配件', sku:'键盘托', expected:120, actual:96, demand:120, opening:70, plannedArrival:50, actualArrival:30, plannedKOL:0, actualKOL:0, plannedToB:0, actualToB:0, price:125, marginRate:0.30}
     ];
 
@@ -614,9 +614,9 @@
       const profitLoss = base.reduce((s,d)=>s+d.profitLoss,0);
       const avgGap = total ? base.reduce((s,d)=>s+d.gap,0)/total : 0;
       const html = [
-        ['样本数', fmtNum(total), '当前筛选范围内的版本×国家×月份×SKU 记录数'],
-        ['未达预计样本', fmtNum(below), `占比 ${(total? below/total:0*100).toFixed? ((below/(total||1))*100).toFixed(1):0}%`],
-        ['断货样本数', fmtNum(stockoutCount), '满足“期末库存=0且可卖库存不足”的样本数'],
+        ['YSPU数', fmtNum(total), '当前筛选范围内的版本×国家×月份×YSPU 数'],
+        ['未达预计YSPU个数', fmtNum(below), `占比 ${(total? below/total:0*100).toFixed? ((below/(total||1))*100).toFixed(1):0}%`],
+        ['断货YSPU个数', fmtNum(stockoutCount), '满足“期末库存=0且可卖库存不足”的YSPU个数'],
         ['断货量', fmtNum(stockoutQty), '所有断货样本的销量损失合计'],
         ['收入损失', fmtMoney(revenueLoss), '断货量 × 单价'],
         ['利润损失', fmtMoney(profitLoss), '收入损失 × 运营利润率']
@@ -635,7 +635,7 @@
       if (filters.result !== '全部') crumbs.push(`结果聚焦：${filters.result}`);
       if (filters.reasonClass !== '全部') crumbs.push(`第二层聚焦：${filters.reasonClass}`);
       if (filters.cause !== '全部') crumbs.push(`第三层聚焦：${filters.cause}`);
-      if (filters.selectedKey) crumbs.push('已选中单条样本');
+      if (filters.selectedKey) crumbs.push('已选中单条YSPU');
       document.getElementById('breadcrumbs').innerHTML = crumbs.map(x => `<span class="crumb">${x}</span>`).join('');
     }
 
@@ -653,7 +653,7 @@
         },
         grid: { left: 48, right: 24, top: 40, bottom: 50 },
         xAxis: { type: 'category', data: resultMap.map(x=>x.name), axisLabel: { interval: 0 } },
-        yAxis: { type: 'value', name: '样本数' },
+        yAxis: { type: 'value', name: 'YSPU个数' },
         series: [{
           type: 'bar',
           data: resultMap.map(x => ({ value: x.value, itemStyle: { color: x.name === '断货导致未达预计' ? '#dc2626' : (x.name === '非断货未达预计' ? '#d97706' : '#16a34a') }, name: x.name })),
@@ -674,7 +674,7 @@
         tooltip: {
           formatter: p => {
             const d = p.data.raw;
-            return `${d.sku}<br/>版本：${d.version}｜国家：${d.country}｜月份：${d.month}<br/>预计销量：${fmtNum(d.expected)}<br/>实际销量：${fmtNum(d.actual)}<br/>实际可卖库存：${fmtNum(d.availableActual)}<br/>期末库存：${fmtNum(d.ending)}<br/>判断结果：${d.result}<br/>收入损失：${fmtMoney(d.revenueLoss)}<br/><span style="color:#667085">点击气泡可锁定单条样本</span>`;
+            return `${d.sku}<br/>版本：${d.version}｜国家：${d.country}｜月份：${d.month}<br/>预计销量：${fmtNum(d.expected)}<br/>实际销量：${fmtNum(d.actual)}<br/>实际可卖库存：${fmtNum(d.availableActual)}<br/>期末库存：${fmtNum(d.ending)}<br/>判断结果：${d.result}<br/>收入损失：${fmtMoney(d.revenueLoss)}<br/><span style="color:#667085">点击气泡可锁定单条YSPU</span>`;
           }
         },
         xAxis: { type: 'value', name: '预计销量' },
@@ -690,7 +690,7 @@
             label: { show: true, formatter: d.sku.length > 8 ? d.sku.slice(0,8)+'…' : d.sku, position: 'top' }
           }))
         }],
-        graphic: [{ type:'text', left:'center', top:10, style:{ text:'对角线以下为“实际低于预计”的样本', fill:'#667085', fontSize:12 }}]
+        graphic: [{ type:'text', left:'center', top:10, style:{ text:'对角线以下为“实际低于预计”的YSPU', fill:'#667085', fontSize:12 }}]
       });
       charts.bubbleChart.off('click');
       charts.bubbleChart.on('click', p => {
@@ -723,7 +723,7 @@
           </thead>
           <tbody>${rows || '<tr><td colspan="12">当前筛选无数据</td></tr>'}</tbody>
         </table>
-        <div class="explain">说明：这一层先回答“到底有没有断货”。若实际销量低于预计销量，但期末库存不为 0，或实际可卖库存仍高于预计销量，则不能直接归为断货；这类样本更可能是预测偏差或销售执行偏差。</div>
+        <div class="explain">说明：这一层先回答“到底有没有断货”。若实际销量低于预计销量，但期末库存不为 0，或实际可卖库存仍高于预计销量，则不能直接归为断货；这类YSPU更可能是预测偏差或销售执行偏差。</div>
       `;
       document.querySelectorAll('#level1Table tr[data-key]').forEach(tr => tr.addEventListener('click', () => {
         filters.selectedKey = tr.getAttribute('data-key');
@@ -738,7 +738,7 @@
         { name: '断货导致', value: misses.filter(d => d.stockout).length }
       ];
       charts.reasonPie.setOption({
-        tooltip: { formatter: p => `${p.name}<br/>样本数：${p.value}<br/>占比：${p.percent}%<br/><span style="color:#667085">点击扇区可聚焦此类原因</span>` },
+        tooltip: { formatter: p => `${p.name}<br/>YSPU个数：${p.value}<br/>占比：${p.percent}%<br/><span style="color:#667085">点击扇区可聚焦此类原因</span>` },
         series: [{
           type: 'pie',
           radius: ['38%', '68%'],
@@ -758,7 +758,7 @@
           formatter: params => {
             const p = params[0];
             const d = p.data.raw;
-            return `${d.sku}<br/>版本：${d.version}｜国家：${d.country}｜月份：${d.month}<br/>预计：${fmtNum(d.expected)}｜实际：${fmtNum(d.actual)}<br/>差额：${fmtNum(d.expected-d.actual)}<br/>分类：${d.executionOrForecast}<br/>期末库存：${fmtNum(d.ending)}<br/><span style="color:#667085">点击条形可锁定该 SKU 样本</span>`;
+            return `${d.sku}<br/>版本：${d.version}｜国家：${d.country}｜月份：${d.month}<br/>预计：${fmtNum(d.expected)}｜实际：${fmtNum(d.actual)}<br/>差额：${fmtNum(d.expected-d.actual)}<br/>分类：${d.executionOrForecast}<br/>期末库存：${fmtNum(d.ending)}<br/><span style="color:#667085">点击条形可锁定该 YSPU</span>`;
           }
         },
         grid:{ left: 120, right: 20, top: 20, bottom: 35 },
@@ -783,13 +783,13 @@
               <td>非断货未达预计</td>
               <td>${non ? `${non.country}｜${non.month}｜${non.sku}` : '-'}</td>
               <td>${non ? `预计${fmtNum(non.expected)} / 实际${fmtNum(non.actual)} / 可卖${fmtNum(non.availableActual)} / 期末${fmtNum(non.ending)}` : '-'}</td>
-              <td>${non ? `该样本实际销量低于预计，但期末库存为 ${fmtNum(non.ending)}，说明“有货未卖完”，不能定义为断货，应优先判断为预测偏差或执行偏差。` : '-'}</td>
+              <td>${non ? `该YSPU实际销量低于预计，但期末库存为 ${fmtNum(non.ending)}，说明“有货未卖完”，不能定义为断货，应优先判断为预测偏差或执行偏差。` : '-'}</td>
             </tr>
             <tr>
               <td>断货导致</td>
               <td>${sto ? `${sto.country}｜${sto.month}｜${sto.sku}` : '-'}</td>
               <td>${sto ? `预计${fmtNum(sto.expected)} / 实际${fmtNum(sto.actual)} / 可卖${fmtNum(sto.availableActual)} / 期末${fmtNum(sto.ending)}` : '-'}</td>
-              <td>${sto ? `该样本期末库存为 0，且实际可卖库存仅 ${fmtNum(sto.availableActual)}，不足以支撑预计销量 ${fmtNum(sto.expected)}，因此可认定为断货，断货量为 ${fmtNum(sto.shortfall)}。` : '-'}</td>
+              <td>${sto ? `该YSPU期末库存为 0，且实际可卖库存仅 ${fmtNum(sto.availableActual)}，不足以支撑预计销量 ${fmtNum(sto.expected)}，因此可认定为断货，断货量为 ${fmtNum(sto.shortfall)}。` : '-'}</td>
             </tr>
           </tbody>
         </table>
@@ -800,7 +800,7 @@
       const stockGap = misses.filter(d=>d.stockout).reduce((s,d)=>s+d.shortfall,0);
       const nonGap = misses.filter(d=>!d.stockout).reduce((s,d)=>s+(d.expected-d.actual),0);
       document.getElementById('level2Narrative').innerHTML = missTotal ?
-        `当前筛选范围内共有 <b>${fmtNum(missTotal)}</b> 个“实际未达预计”样本，累计销量缺口 <b>${fmtNum(missGapTotal)}</b> 件。其中，真正由断货导致的缺口为 <b>${fmtNum(stockGap)}</b> 件，占全部未达预计缺口的 <b>${((stockGap/(missGapTotal||1))*100).toFixed(1)}%</b>；其余 <b>${fmtNum(nonGap)}</b> 件属于“有货未卖完”，更应从预测精度、流量、转化、价格执行等经营因素解释。` : '当前筛选范围内没有“实际未达预计”的样本，第二层无须继续拆解。';
+        `当前筛选范围内共有 <b>${fmtNum(missTotal)}</b> 个“实际未达预计”YSPU，累计销量缺口 <b>${fmtNum(missGapTotal)}</b> 件。其中，真正由断货导致的缺口为 <b>${fmtNum(stockGap)}</b> 件，占全部未达预计缺口的 <b>${((stockGap/(missGapTotal||1))*100).toFixed(1)}%</b>；其余 <b>${fmtNum(nonGap)}</b> 件属于“有货未卖完”，更应从预测精度、流量、转化、价格执行等经营因素解释。` : '当前筛选范围内没有“实际未达预计”的样本，第二层无须继续拆解。';
     }
 
     function renderLevel3(base) {
@@ -869,10 +869,10 @@
       const totalShort = stockouts.reduce((s,d)=>s+d.shortfall,0);
       const topCause = causeData[0];
       document.getElementById('level3Narrative').innerHTML = stockouts.length ?
-        `当前范围内共有 <b>${fmtNum(stockouts.length)}</b> 个断货样本，累计断货量 <b>${fmtNum(totalShort)}</b> 件。断货最主要的驱动因素为 <b>${topCause ? topCause.name : '-'}</b>，贡献断货量 <b>${topCause ? fmtNum(topCause.value) : 0}</b> 件，占全部断货量的 <b>${topCause ? ((topCause.value/(totalShort||1))*100).toFixed(1) : 0}%</b>。这说明当前最需要优先修复的不是“卖不动”，而是供应兑现、占用控制或库存计划设置。` : '当前筛选范围内没有断货样本，第三层无需继续拆解。';
+        `当前范围内共有 <b>${fmtNum(stockouts.length)}</b> 个断货YSPU，累计断货量 <b>${fmtNum(totalShort)}</b> 件。断货最主要的驱动因素为 <b>${topCause ? topCause.name : '-'}</b>，贡献断货量 <b>${topCause ? fmtNum(topCause.value) : 0}</b> 件，占全部断货量的 <b>${topCause ? ((topCause.value/(totalShort||1))*100).toFixed(1) : 0}%</b>。这说明当前最需要优先修复的不是“卖不动”，而是供应兑现、占用控制或库存计划设置。` : '当前筛选范围内没有断货YSPU，第三层无需继续拆解。';
       document.getElementById('formulaExplain').innerHTML = `<b>口径说明</b><br/>1）可卖库存 = 期初库存 + 实际到货 - 实际 KOL 占用 - 实际 ToB 占用；<br/>2）若实际销量 &lt; 预计销量，且期末库存 = 0，同时可卖库存不足预计销量，则定义为断货；<br/>3）断货量 = 预计销量 - 实际销量；<br/>4）收入损失 = 断货量 × 单价；利润损失 = 收入损失 × 运营利润率。`;
       const selected = stockouts[0];
-      document.getElementById('selectedExplain').innerHTML = selected ? `<b>示例解释</b><br/>以 <b>${selected.country}｜${selected.month}｜${selected.sku}</b> 为例：预计销量 ${fmtNum(selected.expected)}，实际销量 ${fmtNum(selected.actual)}，可卖库存仅 ${fmtNum(selected.availableActual)}，且期末库存为 0，因此断货量为 ${fmtNum(selected.shortfall)}。其主要原因是 <b>${selected.primaryCause}</b>，对应收入损失 ${fmtMoney(selected.revenueLoss)}。` : '<b>示例解释</b><br/>当前无断货样本。';
+      document.getElementById('selectedExplain').innerHTML = selected ? `<b>示例解释</b><br/>以 <b>${selected.country}｜${selected.month}｜${selected.sku}</b> 为例：预计销量 ${fmtNum(selected.expected)}，实际销量 ${fmtNum(selected.actual)}，可卖库存仅 ${fmtNum(selected.availableActual)}，且期末库存为 0，因此断货量为 ${fmtNum(selected.shortfall)}。其主要原因是 <b>${selected.primaryCause}</b>，对应收入损失 ${fmtMoney(selected.revenueLoss)}。` : '<b>示例解释</b><br/>当前无断货YSPU。';
     }
 
     function render() {
