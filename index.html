@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inventory Demo Directory</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+      background: #f5f7fb;
+      color: #17212f;
+    }
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+    .hero {
+      background: linear-gradient(135deg, #0f1f4f 0%, #2457d6 100%);
+      color: white;
+      border-radius: 24px;
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: 32px;
+    }
+    .hero p {
+      margin: 0;
+      line-height: 1.8;
+      font-size: 14px;
+      color: rgba(255,255,255,.9);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: white;
+      border: 1px solid #e7edf4;
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 12px 30px rgba(16, 24, 40, .08);
+    }
+    .card h2 {
+      margin: 0 0 10px;
+      font-size: 22px;
+    }
+    .card p {
+      margin: 0 0 18px;
+      color: #5b6678;
+      font-size: 14px;
+      line-height: 1.8;
+      min-height: 88px;
+    }
+    .btn {
+      display: inline-block;
+      padding: 12px 18px;
+      border-radius: 12px;
+      background: #2563eb;
+      color: white;
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .footer {
+      margin-top: 24px;
+      text-align: center;
+      color: #667085;
+      font-size: 12px;
+    }
+    @media (max-width: 900px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+      .card p {
+        min-height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <h1>Inventory 看板目录</h1>
+      <p>
+        本目录页用于集中展示断货分析相关的两个 demo。
+        第一个 demo 面向经营单元 / 分析颗粒，回答“哪些经营单元存在断货影响”；
+        第二个 demo 面向单个 YSPU，回答“某个 YSPU 是否断货、为什么断货、损失多少”。
+      </p>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>断货影响拆解看板 Demo</h2>
+        <p>
+          面向经营单元 / 分析颗粒的断货分析看板，用于判断哪些记录属于断货导致未达预计，
+          并进一步拆分断货原因与损失。
+        </p>
+        <a class="btn" href="./stockout-unit-demo.html">打开看板</a>
+      </div>
+
+      <div class="card">
+        <h2>YSPU断货影响诊断看板 Demo</h2>
+        <p>
+          面向单个 YSPU 的断货分析看板，用于查看该 YSPU 在指定月份、版本号、国家下的
+          预计销量、实际销量、库存链路、断货原因与损失测算。
+        </p>
+        <a class="btn" href="./yspu-stockout-demo.html">打开看板</a>
+      </div>
+    </div>
+
+    <div class="footer">
+      部署于 GitHub Pages · inventory repository
+    </div>
+  </div>
+</body>
+</html>
