@@ -413,9 +413,17 @@
         ['预计可售库存', fmtNum(one.expectedAvailable), '预计期初库存 + 预计到货 - 预计 KOL 占用 - 预计 ToB 占用'],
         ['实际可售库存', fmtNum(one.actualAvailable), '实际期初库存 + 实际到货 - 实际 KOL 占用 - 实际 ToB 占用'],
         ['期末库存', fmtNum(one.endingInventory), '销售月份结束后的库存余额'],
-        ['当前结论', status, status === '断货导致未达预计' ? '当前应重点看断货原因与损失' : (status === '需求超预期' ? '当前应重点看需求低估与潜在风险' : '当前应重点看预测/执行偏差'))
-      ].map(([label,val,note])=>`<div class="kpi"><div class="label">${label}</div><div class="value">${val}</div><div class="note">${note}</div></div>`).join('');
-      document.getElementById('kpis').innerHTML = html;
+        ['当前结论', status, status === '断货导致未达预计'
+          ? '当前应重点看断货原因与损失'
+          : (status === '需求超预期'
+            ? '当前应重点看需求低估与潜在风险'
+            : '当前应重点看预测/执行偏差'
+          )
+         ]
+       ].map(([label,val,note]) =>
+         `<div class="kpi"><div class="label">${label}</div><div class="value">${val}</div><div class="note">${note}</div></div>`
+       ).join('');
+       document.getElementById('kpis').innerHTML = html;
     }
 
     function renderLevel1(one){
